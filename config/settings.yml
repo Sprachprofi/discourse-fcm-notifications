@@ -1,0 +1,10 @@
+plugins:
+  fcm_notifications_enabled:
+    default: false
+    client: true
+  fcm_notifications_project_id:
+    default: ''
+  fcm_notifications_api_key:
+    default: ''
+  fcm_notifications_google_json:
+    default: ''

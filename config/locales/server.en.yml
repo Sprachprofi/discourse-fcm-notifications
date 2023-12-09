@@ -1,0 +1,19 @@
+en:
+  site_settings:
+    fcm_notifications_enabled: Enable app notifications?
+    fcm_notifications_project_id: Firebase project ID
+    fcm_notifications_api_key: Your Firebase key
+    fcm_notifications_google_json: Complete content of json file
+  discourse_fcm_notifications:
+    confirm_title: 'App Notifications - %{site_title}'
+    confirm_body: 'App notifications have been enabled!'
+    subscribe_error: 'Could not subscribe. Is your device key correct?'
+    popup:
+      mentioned: '%{username} mentioned you in "%{topic}" - %{site_title}'
+      group_mentioned: '%{username} mentioned you in "%{topic}" - %{site_title}'
+      quoted: '%{username} quoted you in "%{topic}" - %{site_title}'
+      replied: '%{username} replied to you in "%{topic}" - %{site_title}'
+      posted: '%{username} posted in "%{topic}" - %{site_title}'
+      private_message: '%{username} sent you a private message in "%{topic}" - %{site_title}'
+      chat_message: '%{username} sent you a chat message - %{site_title}'
+      linked: '%{username} linked to your post from "%{topic}" - %{site_title}'

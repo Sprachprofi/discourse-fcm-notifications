@@ -1,0 +1,9 @@
+en:
+  js:
+    discourse_fcm_notifications:
+      title: "App Notifications"
+      disable: "Disable App Notifications"
+      enable: "Enable App Notifications"
+      api_key_placeholder: "Enter your device key"
+      project_id_placeholder: "Enter your Firebase project id"
+      instructions: "Input the device key from the app."
