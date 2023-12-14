@@ -7,8 +7,23 @@ This assumes you have a custom app that includes access to your Discourse forum.
 
 See [the plugin install readme](https://meta.discourse.org/t/install-plugins-in-discourse/19157).
 
-Once installed, you will need a Firebase token.
+Create a Google Firebase project for your app. Add the Firebase project ID, token and the json (with OAuth data) to the plugin settings in your Discourse installation.
 
-After you created the application, copy the resulting token to the Discourse admin plugin pages, and enable the plugin.
+Users will be able to add their device keys in their preference -> Notifications. We recommend that your app include a way to copy the device key and to paste it into the right field without much searching.
 
-Users will be able to add their device keys in their preference -> Notifications.
+# Receiving push notifications in your app
+
+The push notifications that this app creates will include:
+
+````
+'data': {
+  "linked_obj_type" => 'link',
+  "linked_obj_data" => <url to the post/message referenced in the message>,
+},
+'notification': {
+  title: <something like "USERNAME sent you a private message in TOPIC">,
+  body: <beginning of the message>,
+}
+````
+
+So you need to display the push notification with title/body and tapping on it should open the URL from linked_obj_data in an in-app browser. 
