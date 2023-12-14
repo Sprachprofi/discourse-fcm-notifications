@@ -10,7 +10,7 @@ module ::DiscourseFcmNotifications
       DiscourseFcmNotifications::Pusher.subscribe(current_user, params[:token])
       if DiscourseFcmNotifications::Pusher.confirm_subscribe(current_user)
         #flash.now[:notice] = "You have successfully subscribed to push notifications."
-        render json: success_json
+        render json: { success: 'SUCCESS' }
       else
         #flash.now[:alert] = "There was an error subscribing to push notifications."
         render json: { failed: 'FAILED', error: I18n.t("discourse_fcm_notifications.subscribe_error") }
@@ -19,7 +19,7 @@ module ::DiscourseFcmNotifications
     end
     
     def subscribe
-      DiscourseFcmNotifications::Pusher.subscribe(current_user, push_params)
+      DiscourseFcmNotifications::Pusher.subscribe(current_user, params[:subscription])
       if DiscourseFcmNotifications::Pusher.confirm_subscribe(current_user)
         render json: success_json
       else
@@ -32,10 +32,5 @@ module ::DiscourseFcmNotifications
       render json: success_json
     end
 
-    private
-
-    def push_params
-      params.require(:subscription)
-    end
   end
 end
