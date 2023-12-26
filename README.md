@@ -9,7 +9,9 @@ See [the plugin install readme](https://meta.discourse.org/t/install-plugins-in-
 
 Create a Google Firebase project for your app. Add the Firebase project ID, token and the json (with OAuth data) to the plugin settings in your Discourse installation.
 
-Users will be able to add their device keys in their preference -> Notifications. We recommend that your app include a way to copy the device key and to paste it into the right field without much searching.
+Your app can activate push notifications for the active user by sending the device token to YOUR_FORUM.com/fcm_notifications/automatic_subscribe?token=... . Be sure to call this every time the device token changes. To deactivate push notifications for the active user, call YOUR_FORUM.com/fcm_notifications/automatic_subscribe?token=REMOVE . 
+
+Alternatively, you can have users copy-paste their device tokens in their preference -> Notifications. 
 
 # Receiving push notifications in your app
 

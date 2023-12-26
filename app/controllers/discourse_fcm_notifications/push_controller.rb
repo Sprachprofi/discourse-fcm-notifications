@@ -7,15 +7,19 @@ module ::DiscourseFcmNotifications
     skip_before_action :preload_json
 
     def automatic_subscribe
-      DiscourseFcmNotifications::Pusher.subscribe(current_user, params[:token])
-      if DiscourseFcmNotifications::Pusher.confirm_subscribe(current_user)
-        #flash.now[:notice] = "You have successfully subscribed to push notifications."
+      if params[:token] == "REMOVE"
+        DiscourseFcmNotifications::Pusher.unsubscribe(current_user)
         render json: { success: 'SUCCESS' }
       else
-        #flash.now[:alert] = "There was an error subscribing to push notifications."
-        render json: { failed: 'FAILED', error: I18n.t("discourse_fcm_notifications.subscribe_error") }
+        DiscourseFcmNotifications::Pusher.subscribe(current_user, params[:token])
+        if DiscourseFcmNotifications::Pusher.confirm_subscribe(current_user)
+          #flash.now[:notice] = "You have successfully subscribed to push notifications."
+          render json: { success: 'SUCCESS' }
+        else
+          #flash.now[:alert] = "There was an error subscribing to push notifications."
+          render json: { failed: 'FAILED', error: I18n.t("discourse_fcm_notifications.subscribe_error") }
+        end
       end
-      #redirect_to '/'
     end
     
     def subscribe
