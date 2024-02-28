@@ -84,11 +84,15 @@ module ::DiscourseFcmNotifications
 
       response = fcm.send_v1(message)
       if response[:response] == 'success'
+        Rails.logger.info "Successfully sent push notification about #{message_hash[:title]} to token " + user.custom_fields[DiscourseFcmNotifications::PLUGIN_NAME].to_s 
         return true
       else
         if response[:status_code] == 400
-          Rails.logger.error "ERROR: push notification was malformed. " + response[:body].to_s
+          txt = "ERROR: push notification was malformed. Tried to send notif about #{message_hash[:title]} to token " 
+          txt += user.custom_fields[DiscourseFcmNotifications::PLUGIN_NAME].to_s + " and body response was: " + response[:body].to_s
+          Rails.logger.error txt
         elsif response[:status_code] == 404
+          Rails.logger.error "Possible error: push notification was sent to a token that is no longer valid. Unsubscribing user " + user.custom_fields[DiscourseFcmNotifications::PLUGIN_NAME].to_s
           self.unsubscribe user
         else 
           Rails.logger.error "ERROR: something was wrong with the push notification, code #{response[:status_code]}. Body: " + response[:body].to_s
