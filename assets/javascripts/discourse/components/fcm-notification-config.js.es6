@@ -28,7 +28,7 @@ export default Ember.Component.extend({
   fcmNotificationSubscribed: null,
 
   init() {
-    super(...arguments);
+    this._super(...arguments);
     this.setProperties({
       fcmNotificationSubscribed:
         this.currentUser.custom_fields
