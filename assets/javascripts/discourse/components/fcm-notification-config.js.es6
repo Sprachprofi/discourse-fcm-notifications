@@ -7,7 +7,7 @@ import {
   unsubscribe as unsubscribeFcmNotification
 } from "discourse/plugins/discourse-fcm-notifications/discourse/lib/fcm-notifications";
 
-export default Ember.Component.extend({
+export default Component.extend({
   @discourseComputed
   showFcmNotification() {
     return this.siteSettings.fcm_notifications_enabled;
