@@ -12,8 +12,8 @@ export default Ember.Component.extend({
     return this.siteSettings.fcm_notifications_enabled;
   },
 
-  has_subscription: Ember.computed.empty("subscription"),
-  disabled: Ember.computed.or("has_subscription", "loading"),
+  has_subscription: computed({ empty: "subscription"}),
+  disabled: computed({ or: ["has_subscription", "loading"]}),
   loading: false,
   errorMessage: null,
 
@@ -28,7 +28,7 @@ export default Ember.Component.extend({
   fcmNotificationSubscribed: null,
 
   init() {
-    this._super(...arguments);
+    super(...arguments);
     this.setProperties({
       fcmNotificationSubscribed:
         this.currentUser.custom_fields
