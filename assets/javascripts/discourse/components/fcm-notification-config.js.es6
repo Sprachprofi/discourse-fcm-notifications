@@ -1,5 +1,6 @@
 import { default as discourseComputed } from "discourse-common/utils/decorators";
-
+import Component from "@ember/component";
+import { empty, or } from '@ember/object/computed';
 
 import {
   subscribe as subscribeFcmNotification,
@@ -12,8 +13,8 @@ export default Ember.Component.extend({
     return this.siteSettings.fcm_notifications_enabled;
   },
 
-  has_subscription: computed({ empty: "subscription"}),
-  disabled: computed({ or: ["has_subscription", "loading"]}),
+  has_subscription: empty("subscription"),
+  disabled: or("has_subscription", "loading"),
   loading: false,
   errorMessage: null,
 
