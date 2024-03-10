@@ -4,6 +4,8 @@ require "net/https"
 
 module ::DiscourseFcmNotifications
   class Pusher
+    @@last_msg = ""
+
     def self.push(user, payload)
       message = {
         title: I18n.t(
@@ -44,62 +46,69 @@ module ::DiscourseFcmNotifications
     private
 
     def self.send_notification(user, message_hash)
-      filename = "gcp_key.json"
-      if !File.exist?(filename) and SiteSetting.fcm_notifications_google_json
-        File.open(filename, 'w') { |file| file.write(SiteSetting.fcm_notifications_google_json) }
-      end
-      raise "Error: Missing google json for push notifications" unless File.exist?(filename)
-      
-		  fcm = FCM.new(SiteSetting.fcm_notifications_api_key, filename, SiteSetting.fcm_notifications_project_id)
+      # always remember the last message that was sent out, in order to avoid duplicates from race conditions
+      log_this = user.custom_fields[DiscourseFcmNotifications::PLUGIN_NAME].to_s + " " + message_hash[:message]
+      if @@last_msg != log_this
+        @@last_msg = log_this  
 
-      message = {
-        'token': user.custom_fields[DiscourseFcmNotifications::PLUGIN_NAME],
-        'data': {
-          "linked_obj_type" => 'link',
-          "linked_obj_data" => message_hash[:url],
-        },
-        'notification': {
-          title: message_hash[:title],
-          body: message_hash[:message],
-        },
-        'android': {
-          "priority": "normal",
-        },
-        'apns': {
-          headers:{
-            "apns-priority":"5"
-          },
-          payload: {
-            aps: {
-              "category": "#{Time.zone.now.to_i}",
-              "sound": "default",
-              "interruption-level": "active"
-            }
-          },
-        },
-        'fcm_options': {
-          "analytics_label": "Label"
-        }
-      }
-
-      response = fcm.send_v1(message)
-      if response[:response] == 'success'
-        Rails.logger.info "Successfully sent push notification about #{message_hash[:title]} to token " + user.custom_fields[DiscourseFcmNotifications::PLUGIN_NAME].to_s 
-        return true
-      else
-        if response[:status_code] == 400
-          txt = "ERROR: push notification was malformed. Tried to send notif about #{message_hash[:title]} to token " 
-          txt += user.custom_fields[DiscourseFcmNotifications::PLUGIN_NAME].to_s + " and body response was: " + response[:body].to_s
-          Rails.logger.error txt
-        elsif response[:status_code] == 404
-          Rails.logger.error "Possible error: push notification was sent to a token that is no longer valid. Unsubscribing user " + user.custom_fields[DiscourseFcmNotifications::PLUGIN_NAME].to_s
-          self.unsubscribe user
-        else 
-          Rails.logger.error "ERROR: something was wrong with the push notification, code #{response[:status_code]}. Body: " + response[:body].to_s
+        filename = "gcp_key.json"
+        if !File.exist?(filename) and SiteSetting.fcm_notifications_google_json
+          File.open(filename, 'w') { |file| file.write(SiteSetting.fcm_notifications_google_json) }
         end
-        return false
-      end      
-    end
+        raise "Error: Missing google json for push notifications" unless File.exist?(filename)
+        
+        fcm = FCM.new(SiteSetting.fcm_notifications_api_key, filename, SiteSetting.fcm_notifications_project_id)
 
+        message = {
+          'token': user.custom_fields[DiscourseFcmNotifications::PLUGIN_NAME],
+          'data': {
+            "linked_obj_type" => 'link',
+            "linked_obj_data" => message_hash[:url],
+          },
+          'notification': {
+            title: message_hash[:title],
+            body: message_hash[:message],
+          },
+          'android': {
+            "priority": "normal",
+          },
+          'apns': {
+            headers:{
+              "apns-priority":"5"
+            },
+            payload: {
+              aps: {
+                "category": "#{Time.zone.now.to_i}",
+                "sound": "default",
+                "interruption-level": "active"
+              }
+            },
+          },
+          'fcm_options': {
+            "analytics_label": "Label"
+          }
+        }
+
+
+        response = fcm.send_v1(message)
+        if response[:response] == 'success'
+          Rails.logger.info "Successfully sent push notification about #{message_hash[:title]} to token " + user.custom_fields[DiscourseFcmNotifications::PLUGIN_NAME].to_s 
+          return true
+        else
+          if response[:status_code] == 400
+            txt = "ERROR: push notification was malformed. Tried to send notif about #{message_hash[:title]} to token " 
+            txt += user.custom_fields[DiscourseFcmNotifications::PLUGIN_NAME].to_s + " and body response was: " + response[:body].to_s
+            Rails.logger.error txt
+          elsif response[:status_code] == 404
+            Rails.logger.error "Possible error: push notification was sent to a token that is no longer valid. Unsubscribing user " + user.custom_fields[DiscourseFcmNotifications::PLUGIN_NAME].to_s
+            self.unsubscribe user
+          else 
+            Rails.logger.error "ERROR: something was wrong with the push notification, code #{response[:status_code]}. Body: " + response[:body].to_s
+          end
+          return false
+        end  
+      end    
+    end
   end
+
 end
