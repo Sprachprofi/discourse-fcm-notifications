@@ -4,7 +4,8 @@ require "net/https"
 
 module ::DiscourseFcmNotifications
   class Pusher
-    @@last_msg = ""
+    @@last_token = ""
+    @@last_time = nil
 
     def self.push(user, payload)
       message = {
@@ -18,6 +19,19 @@ module ::DiscourseFcmNotifications
         url: "#{Discourse.base_url}/#{payload[:post_url]}"
       }
       self.send_notification(user, message)
+    end
+
+    # checks if a message was sent to the same user less than 2 minutes ago, to prevent flurry of notifications
+    def self.already_sent?(user)
+      token = user.custom_fields[DiscourseFcmNotifications::PLUGIN_NAME]
+      if (@@last_token == token) and (@@last_time.is_a?(Time) && (@@last_time < 2.minutes.ago))
+        Rails.logger.info "Already sent a notification to #{user.username} less than 2 minutes ago"
+        true
+      else
+        @@last_token = token
+        @@last_time = Time.now
+        false
+      end
     end
 
     def self.confirm_subscribe(user)
@@ -45,12 +59,9 @@ module ::DiscourseFcmNotifications
 
     private
 
-    def self.send_notification(user, message_hash)
-      # always remember the last message that was sent out, in order to avoid duplicates from race conditions
-      log_this = user.custom_fields[DiscourseFcmNotifications::PLUGIN_NAME].to_s + " " + message_hash[:message]
-      if @@last_msg != log_this
-        @@last_msg = log_this  
-
+    def self.send_notification(user, message_hash) 
+      if user and message_hash and !self.already_sent?(user) 
+        Rails.logger.info "Sending a notification to #{user.username} about #{message_hash[:title]}"
         filename = "gcp_key.json"
         if !File.exist?(filename) and SiteSetting.fcm_notifications_google_json
           File.open(filename, 'w') { |file| file.write(SiteSetting.fcm_notifications_google_json) }
