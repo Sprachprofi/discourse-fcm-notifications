@@ -30,6 +30,8 @@ module ::DiscourseFcmNotifications
         else
           render json: { failed: 'FAILED', error: I18n.t("discourse_fcm_notifications.subscribe_error") }
         end
+      else
+        render json: { failed: 'FAILED', error: I18n.t("discourse_fcm_notifications.the_same") }
       end
     end
 
