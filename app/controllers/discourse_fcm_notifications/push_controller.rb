@@ -23,11 +23,15 @@ module ::DiscourseFcmNotifications
     end
     
     def subscribe
-      DiscourseFcmNotifications::Pusher.subscribe(current_user, params[:subscription])
-      if DiscourseFcmNotifications::Pusher.confirm_subscribe(current_user)
-        render json: success_json
+      if current_user.custom_fields[DiscourseFcmNotifications::PLUGIN_NAME] != params[:subscription]
+        DiscourseFcmNotifications::Pusher.subscribe(current_user, params[:subscription])
+        if DiscourseFcmNotifications::Pusher.confirm_subscribe(current_user)
+          render json: success_json
+        else
+          render json: { failed: 'FAILED', error: I18n.t("discourse_fcm_notifications.subscribe_error") }
+        end
       else
-        render json: { failed: 'FAILED', error: I18n.t("discourse_fcm_notifications.subscribe_error") }
+        render json: { failed: 'FAILED', error: I18n.t("discourse_fcm_notifications.the_same") }
       end
     end
 
