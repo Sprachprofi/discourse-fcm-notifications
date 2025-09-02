@@ -1,7 +1,7 @@
 # discourse-fcm-notifications
 Plugin for having Discourse deliver push notifications to your custom iOS/Android app through Firebase.
 
-This assumes you have a custom app that includes access to your Discourse forum. It won't work without such an app. If you don't have an app, try Discourse Pushover Notifications instead.
+This assumes you have a custom app that includes access to your Discourse forum. It won't work without such an app. If you don't have an app, I've designed a [basic app](https://payhip.com/b/3Dplj) that will let users browse your Discourse forum and receive push notifications, but submitting an app to the App Store and Google Play Store is not super simple. Alternatively, you can use the Discourse Pushover Notifications plugin instead, but then it's two clicks for users to go from a notification to your forum.
 
 # Installation
 
