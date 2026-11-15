@@ -7,10 +7,17 @@
 # url: https://github.com/sprachprofi/discourse-fcm-notifications
 
 enabled_site_setting :fcm_notifications_enabled
-gem 'signet', '0.17.0'
+
+# Discourse installs plugin gems one at a time without resolving dependencies,
+# so every dependency Discourse does not bundle itself must be listed here,
+# before the gem that needs it. (faraday, jwt, addressable and base64 come
+# from Discourse.)
+gem 'pstore', '0.2.1'
 gem 'os', '1.1.4'
-gem 'memoist', '0.16.2'
-gem 'googleauth', '1.7.0'
+gem 'google-cloud-env', '2.4.1', require: false
+gem 'google-logging-utils', '0.2.2', require: false
+gem 'signet', '0.22.2'
+gem 'googleauth', '1.17.7'
 gem 'fcm', '1.0.8'
 
 module ::DiscourseFcmNotifications
