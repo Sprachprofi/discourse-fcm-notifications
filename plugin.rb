@@ -24,6 +24,12 @@ after_initialize do
   User.register_custom_field_type(DiscourseFcmNotifications::PLUGIN_NAME, :json)
   allow_staff_user_custom_field DiscourseFcmNotifications::PLUGIN_NAME
 
+  # Tells the logged-in user's own client whether they have a device token
+  # stored, without sending the token itself.
+  add_to_serializer(:current_user, :fcm_notifications_subscribed) do
+    object.custom_fields[DiscourseFcmNotifications::PLUGIN_NAME].present?
+  end
+
   DiscourseEvent.on(:push_notification) do |user, payload|
     if SiteSetting.fcm_notifications_enabled?
       Jobs.enqueue(:send_fcm_notifications, user_id: user.id, payload: payload)
